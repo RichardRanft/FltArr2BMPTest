@@ -38,6 +38,13 @@
             this.fbdOutfolder = new System.Windows.Forms.FolderBrowserDialog();
             this.btnProcess = new System.Windows.Forms.Button();
             this.pbxImagePreview = new System.Windows.Forms.PictureBox();
+            this.btnProcessBMP = new System.Windows.Forms.Button();
+            this.btnBrowseOutBMP = new System.Windows.Forms.Button();
+            this.tbxBMPOut = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.btnOpenBMP = new System.Windows.Forms.Button();
+            this.tbxBMPIn = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbxImagePreview)).BeginInit();
             this.SuspendLayout();
             // 
@@ -54,12 +61,12 @@
             // 
             this.tbxInput.Location = new System.Drawing.Point(12, 25);
             this.tbxInput.Name = "tbxInput";
-            this.tbxInput.Size = new System.Drawing.Size(432, 20);
+            this.tbxInput.Size = new System.Drawing.Size(418, 20);
             this.tbxInput.TabIndex = 1;
             // 
             // btnBrowseInput
             // 
-            this.btnBrowseInput.Location = new System.Drawing.Point(450, 23);
+            this.btnBrowseInput.Location = new System.Drawing.Point(436, 23);
             this.btnBrowseInput.Name = "btnBrowseInput";
             this.btnBrowseInput.Size = new System.Drawing.Size(75, 23);
             this.btnBrowseInput.TabIndex = 2;
@@ -69,7 +76,7 @@
             // 
             // btnBrowseOutput
             // 
-            this.btnBrowseOutput.Location = new System.Drawing.Point(450, 62);
+            this.btnBrowseOutput.Location = new System.Drawing.Point(436, 62);
             this.btnBrowseOutput.Name = "btnBrowseOutput";
             this.btnBrowseOutput.Size = new System.Drawing.Size(75, 23);
             this.btnBrowseOutput.TabIndex = 5;
@@ -81,7 +88,7 @@
             // 
             this.tbxOutputFile.Location = new System.Drawing.Point(12, 64);
             this.tbxOutputFile.Name = "tbxOutputFile";
-            this.tbxOutputFile.Size = new System.Drawing.Size(432, 20);
+            this.tbxOutputFile.Size = new System.Drawing.Size(418, 20);
             this.tbxOutputFile.TabIndex = 4;
             // 
             // label2
@@ -111,11 +118,80 @@
             this.pbxImagePreview.TabIndex = 7;
             this.pbxImagePreview.TabStop = false;
             // 
+            // btnProcessBMP
+            // 
+            this.btnProcessBMP.Location = new System.Drawing.Point(531, 90);
+            this.btnProcessBMP.Name = "btnProcessBMP";
+            this.btnProcessBMP.Size = new System.Drawing.Size(75, 23);
+            this.btnProcessBMP.TabIndex = 14;
+            this.btnProcessBMP.Text = "Process";
+            this.btnProcessBMP.UseVisualStyleBackColor = true;
+            this.btnProcessBMP.Click += new System.EventHandler(this.btnProcessBMP_Click);
+            // 
+            // btnBrowseOutBMP
+            // 
+            this.btnBrowseOutBMP.Location = new System.Drawing.Point(955, 62);
+            this.btnBrowseOutBMP.Name = "btnBrowseOutBMP";
+            this.btnBrowseOutBMP.Size = new System.Drawing.Size(75, 23);
+            this.btnBrowseOutBMP.TabIndex = 13;
+            this.btnBrowseOutBMP.Text = "Browse";
+            this.btnBrowseOutBMP.UseVisualStyleBackColor = true;
+            this.btnBrowseOutBMP.Click += new System.EventHandler(this.btnBrowseOutput_Click);
+            // 
+            // tbxBMPOut
+            // 
+            this.tbxBMPOut.Location = new System.Drawing.Point(531, 64);
+            this.tbxBMPOut.Name = "tbxBMPOut";
+            this.tbxBMPOut.Size = new System.Drawing.Size(418, 20);
+            this.tbxBMPOut.TabIndex = 12;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(531, 48);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(58, 13);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "Output File";
+            // 
+            // btnOpenBMP
+            // 
+            this.btnOpenBMP.Location = new System.Drawing.Point(955, 23);
+            this.btnOpenBMP.Name = "btnOpenBMP";
+            this.btnOpenBMP.Size = new System.Drawing.Size(75, 23);
+            this.btnOpenBMP.TabIndex = 10;
+            this.btnOpenBMP.Text = "Browse";
+            this.btnOpenBMP.UseVisualStyleBackColor = true;
+            this.btnOpenBMP.Click += new System.EventHandler(this.btnBrowseInput_Click);
+            // 
+            // tbxBMPIn
+            // 
+            this.tbxBMPIn.Location = new System.Drawing.Point(531, 25);
+            this.tbxBMPIn.Name = "tbxBMPIn";
+            this.tbxBMPIn.Size = new System.Drawing.Size(418, 20);
+            this.tbxBMPIn.TabIndex = 9;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(531, 9);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(50, 13);
+            this.label4.TabIndex = 8;
+            this.label4.Text = "Input File";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1048, 1053);
+            this.Controls.Add(this.btnProcessBMP);
+            this.Controls.Add(this.btnBrowseOutBMP);
+            this.Controls.Add(this.tbxBMPOut);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.btnOpenBMP);
+            this.Controls.Add(this.tbxBMPIn);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.pbxImagePreview);
             this.Controls.Add(this.btnProcess);
             this.Controls.Add(this.btnBrowseOutput);
@@ -144,6 +220,13 @@
         private System.Windows.Forms.FolderBrowserDialog fbdOutfolder;
         private System.Windows.Forms.Button btnProcess;
         private System.Windows.Forms.PictureBox pbxImagePreview;
+        private System.Windows.Forms.Button btnProcessBMP;
+        private System.Windows.Forms.Button btnBrowseOutBMP;
+        private System.Windows.Forms.TextBox tbxBMPOut;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button btnOpenBMP;
+        private System.Windows.Forms.TextBox tbxBMPIn;
+        private System.Windows.Forms.Label label4;
     }
 }
 
