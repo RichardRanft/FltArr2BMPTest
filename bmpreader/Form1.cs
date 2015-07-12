@@ -14,9 +14,13 @@ namespace bmpreader
 {
     public partial class Form1 : Form
     {
+        private System.IO.StreamWriter m_logfile;
+        private string formatter = "{0,16:E7}{1,20}";
+
         public Form1()
         {
             InitializeComponent();
+            m_logfile = new System.IO.StreamWriter("Log.txt");
         }
 
         public static Bitmap BytesToBitmap(byte[] byteArray)
@@ -30,37 +34,53 @@ namespace bmpreader
 
         private void processFile(String infile, String outfile)
         {
-            if (infile.Length < 1 || outfile.Length < 1)
+            if (infile.Length < 1)
                 return;
-            System.IO.StreamWriter file = new System.IO.StreamWriter("Log.txt");
 
             FileStream fs = new FileStream(infile, FileMode.Open, FileAccess.Read);
             BinaryReader r = new BinaryReader(fs);
-            long len = fs.Length / 4;
-            file.WriteLine("Opened " + infile);
-            file.WriteLine("File Length: " + (len * 4).ToString());
-            file.WriteLine("Length: " + len.ToString());
+            long len = fs.Length / sizeof(float);
+            m_logfile.WriteLine("Opened " + infile);
+            m_logfile.WriteLine("File Length: " + fs.Length);
+            m_logfile.WriteLine("Length: " + len.ToString());
             uint[] megagrey = new uint[len];
             float rawflt = 0.0F;
             float last = 0.0F;
             int run = 0;
-            for (int i = 0; i < len; i++)
+            List<float> fltlist = new List<float>();
+            using(fs)
+            {
+                bool eof = false;
+                while (!eof)
+                {
+                    try
+                    {
+                        fltlist.Add(Math.Abs(r.ReadSingle()));
+                    }
+                    catch (EndOfStreamException)
+                    {
+                        eof = true;
+                    }
+                }
+            }
+            m_logfile.WriteLine("List length: " + fltlist.Count);
+            for(int i = 0; i < fltlist.Count; i++)
             {
                 last = rawflt;
-                rawflt = Math.Abs(r.ReadSingle());
-                if (rawflt == 0.0F || rawflt == 1.0F)
-                    file.WriteLine("-- line " + i.ToString() + " = " + rawflt.ToString());
+                rawflt = fltlist[i];
+                if (rawflt <= 0.0F || rawflt >= 1.0F)
+                    m_logfile.WriteLine("-- line " + i.ToString() + " = " + rawflt.ToString());
                 if (i != 0 && rawflt == last)
                 {
                     if (run == 0)
-                        file.WriteLine("-- value " + i.ToString() + " is identical to " + (i - 1).ToString() + " : " + rawflt.ToString());
+                        m_logfile.WriteLine("-- value @" + i.ToString() + " == value @" + (i - 1).ToString() + " : " + rawflt.ToString());
                     else
-                        file.WriteLine("-- value " + i.ToString() + " is identical to " + (i - 1).ToString() + " : " + rawflt.ToString() + " - run of " + run.ToString() + " values");
+                        m_logfile.WriteLine("-- value @" + i.ToString() + " == value @" + (i - 1).ToString() + " : " + rawflt.ToString() + " - run for " + (run + 1).ToString());
                     run++;
                 }
                 else
                     run = 0;
-                megagrey[i] = (uint)(rawflt * 255);
+                megagrey[i] = (uint)(fltlist[i] * 255);
             }
 
             Bitmap newBitmap = new Bitmap(1024, 1024, PixelFormat.Format24bppRgb);
@@ -69,7 +89,7 @@ namespace bmpreader
             {
                 for (int i = 0; i < 1024; i++)
                 {
-                    pix = (int)megagrey[i + j * 1024];
+                    pix = (int)megagrey[i + (j * 1024)];
                     Color newColor = Color.FromArgb(pix, pix, pix);
                     newBitmap.SetPixel(i, j, newColor);
                 }
@@ -79,7 +99,7 @@ namespace bmpreader
             // MemoryStream bitmapDataStream = new MemoryStream(megagrey);
             //  Bitmap bitmap = new Bitmap(bitmapDataStream);
             // bitmap.Save("medota2", ImageFormat.Bmp);
-            file.WriteLine("Saving bitmap to " + outfile);
+            m_logfile.WriteLine("Saving bitmap to " + outfile);
 
             Image img = (Image)newBitmap;
             if (Path.GetFileName(outfile) == "")
@@ -88,8 +108,8 @@ namespace bmpreader
                 outfile += ".bmp";
             newBitmap.Save(outfile, ImageFormat.Bmp);
             
-            file.WriteLine("Done processing " + infile);
-            file.Close();
+            m_logfile.WriteLine("Done processing " + infile);
+            m_logfile.Flush();
         }
 
         private void btnProcess_Click(object sender, EventArgs e)
@@ -102,10 +122,16 @@ namespace bmpreader
             if(ofdInfile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 Button btn = (Button)sender;
-                if(btn.Name == btnBrowseInput.Name)
+                if (btn.Name == btnBrowseInput.Name)
+                {
                     tbxInput.Text = ofdInfile.FileName;
+                    tbxOutputFile.Text = tbxInput.Text.Replace(Path.GetExtension(tbxInput.Text), ".bmp");
+                }
                 if (btn.Name == btnOpenBMP.Name)
+                {
                     tbxBMPIn.Text = ofdInfile.FileName;
+                    tbxBMPOut.Text = tbxBMPIn.Text.Replace(Path.GetExtension(tbxBMPIn.Text), ".rfa");
+                }
             }
         }
 
@@ -142,6 +168,10 @@ namespace bmpreader
             int imgWidth = pbxImagePreview.Image.Width;
             int imgHeight = pbxImagePreview.Image.Height;
             long length = imgWidth * imgHeight;
+            m_logfile.WriteLine("Opened " + infile);
+            m_logfile.WriteLine("Image Width: " + imgWidth);
+            m_logfile.WriteLine("Image Height: " + imgHeight);
+            m_logfile.WriteLine("Length: " + length.ToString());
             
             CRawColor[] buffer = new CRawColor[length];
             Bitmap bmp = (Bitmap)pbxImagePreview.Image;
@@ -157,16 +187,21 @@ namespace bmpreader
                     buffer[i + j * imgWidth] = new CRawColor(red, grn, blu);
                 }
             }
-            using (StreamWriter sw = new StreamWriter(outfile))
+            m_logfile.WriteLine("Buffer length: " + buffer.Length);
+            m_logfile.WriteLine("Estimated output length (bytes): " + (sizeof(float) * buffer.Length).ToString());
+            FileStream fs = new FileStream(outfile, FileMode.Create);
+            using (BinaryWriter sw = new BinaryWriter(fs))
             {
-                for (int i = 0; i < length; i++)
-                {
-                    if (i < (length - 1))
-                        sw.Write(buffer[i].Gray + " ");
-                    else
-                        sw.Write(buffer[i].Gray.ToString());
-                }
+                foreach(CRawColor val in buffer)
+                    sw.Write(val.Gray);
             }
+            m_logfile.WriteLine("Finished dumping " + outfile);
+            m_logfile.Flush();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            m_logfile.Close();
         }
     }
 
